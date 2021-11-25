@@ -8,36 +8,43 @@
     </head>
     <body>
 
-      <div class=app> 
-        <div style="color:blue"> 
-        Sleep Time 
-        <table>
-        <tr>
-        <th style="border:1px solid black">Sleep Time</th>
-        </tr>
-        <tr>
-        <th>
-        <th class="time">1</th>
-        <th class="time">2</th>
-        <th class="time">3</th>
-        <th class="time">4</th>
-        <th class="time">5</th>
-        <th class="time">6</th>
-        
-        </tr>
-        <th style="border:1px solid black">Number of Awakenings</th>
-        </tr>
-        <tr>
-        </th>
-        <tr>
-        <th>
-        <!--input style="border:1px solid black" id="sleeptime" type = "number" class=sleep_time></input-->
-        <input type = "text" id="sleeptime" style="border:1px solid black" class=sleep_time></input>
-        </th>
-        </tr>
+      <div id=app class=app>
+	  <h1>Sleep Diary</h1> 
+	   <div hidden> 
+	   <tr><th><h3>Submit time:</h3> <br><input type="text" id=submit_time></th></tr>
+	   </div>
+       
+	   <form>
+	   <br>
+	
+	   <tr><th>Sleep time <br><input type="time" id=sleeptime placeholder="Answer in 24hr Time e.g. 23:30" required></th></tr><br>
+		<tr><td</td></tr><br>
 
-        </table>
+
+		<tr><th>Wake Up Time (Final Awakening) <br><input type="time" id=wakeuptime placeholder="Answer in 24hr Time e.g. 23:30" required></th></tr><br>
+		<tr><td</td></tr><br>
+	   <tr><th>Time it took for you to fall asleep<br> <input type="text" id=sol_time placeholder="e.g. 20 minutes" required></th></tr><br>
+	   <tr><td</td></tr><br>
+	  
+	   <tr><th>Number of Awakenings<br> <input type="number" id=no_awakening ></th></tr><br>
+	   <tr><td</td></tr><br>
+
+	   <!-- Visual Analog Scales -->
+		<tr><th>Sleep Quality<br> Bad<input type="range" min="0" max="10" value="0" class="slider" id="sleep_quality" required>Good</th></tr><br>
+		<p>Value: <span id="sleep_quality_val"></span></p>
+	   <tr><td</td></tr><br>
+
+		<tr><th>Sleepiness<br> Bad<input type="range" min="0" max="9" value="0" class="slider" id="kss" required>Good</th></tr><br>
+		<p>Value: <span id="kss_val"></span></p>
+	   <tr><td</td></tr><br>
+	  
+	  <tr><th>Comments or Anything else to note: <br> <textarea id=comments style="width:500px;height:200px;resize:none;"></textarea></th></tr><br>
+	   <tr><td</td></tr><br>
+
+
+	   </form>
         <!--<button onclick="submit()">Submit</button>-->
+		<br>
         <button id=submit_1>Submit</button>
 
         </div>
@@ -46,29 +53,27 @@
 
       <style>
       .app{
-      background-color:gray;
+	  margin-left:auto;
+	  margin-right:auto;
+	  position:absolute;
+      background-color:#f8f3d0;
       width:100%;
       height:100%;
       }
       .time{
       border:1px solid black;
       }
-
+	  .tr{
+	  padding:20px;
+	  }
+	  input{
+	  width:200px;
+	  }
 
 
       </style>
       <script>
-
-      function submit(){
-      var sleeptime=document.getElementById("sleeptime").value;
-      alert(sleeptime);
         
-
-      //console.log('done')
-      //fs.writeFile("test.txt",sleeptime);
-
-      }
-
 
   var download_txt=function(fn,txt){
     //-----------------------
@@ -110,15 +115,76 @@
   //---------------------------------------------
 
 
+	
+
+		// Sleep Quality Slider
+		{var sleep_qual_slider = document.getElementById("sleep_quality");
+		var output = document.getElementById("sleep_quality_val");
+		output.innerHTML = sleep_qual_slider.value; // Display the default slider value
+
+		// Update the current slider value (each time you drag the slider handle)
+		sleep_qual_slider.oninput = function () {
+		output.innerHTML = this.value;
+		$('#sleep_quality').val(this.value);
+		}}
+
+
+		// KSS
+		var kss_slider = document.getElementById("kss");
+		var output1 = document.getElementById("kss_val");
+		output1.innerHTML = kss_slider.value; // Display the default slider value
+		
+		// Update the current slider value (each time you drag the slider handle)
+		kss_slider.oninput = function () {
+		output1.innerHTML = this.value;
+			if (this.value==1){
+				output1.innerHTML="1 - Very Alert"
+			}
+			if (this.value==3){
+				output1.innerHTML="3 - alert, normal level"
+			}
+			if (this.value==5){
+				output1.innerHTML="5 - neither alert nor sleepy"
+			}
+			if (this.value==7){
+				output1.innerHTML="7	- sleepy, but no effort to keep awake"
+			}
+			if (this.value==9){
+				output1.innerHTML="9	- very sleepy, great effort to keep awake, fighting sleep"
+			}
+		$('#kss').val(this.value) ;
+		}
+		
+	
 
       $('#submit_1').on('click',function(){
-        alert(1)
-        var new_txt="Sleep time =" + $('#sleeptime').val();
-        var txt=localStorage.getItem("Sleep");
-        txt+="\r\n"+new_txt;
-        
-        localStorage.setItem("Sleep",txt);
-        download_txt("test.txt",txt);
+        // alert($('#sleeptime').val())
+		var entry = "";
+        var today = new Date();
+		var dd = String(today.getDate()).padStart(2, '0');
+		var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+		var yyyy = today.getFullYear();
+		var hour = String(today.getHours()).padStart(2,'0');
+		var minute = String(today.getMinutes()).padStart(2,'0');
+		var second = String(today.getSeconds()).padStart(2,'0');
+		today =dd+'/'+mm+'/'+yyyy+" "+hour+":"+minute+":"+second;
+		
+		//Getting all the inputs: 
+		var submit_time="Submit Time = "+ today;
+		var sleep_time="Sleep time =" + $('#sleeptime').val();
+        var wakeup_time="Wake up time = "+ $('#wakeuptime').val();
+		var sol_time = "Time to Fall Sleep (SoL) =" + $('#sol_time').val(); 
+		var awakenings="Number of Awakenings = "+ $('#no_awakening').val();
+		var sleep_quality_vas="Sleep Quality VAS = "+ $('#sleep_quality').val();
+		var kss="KSS =" + $('#kss').val();
+		var comments = "Comments/Notes = " + $('#comments');
+		var nl="\r\n"
+		// var txt=localStorage.getItem("Sleep");
+        // txt+="\r\n"+new_txt;
+        entry += sleep_time + nl + wakeup_time +nl+ sol_time + nl + awakenings + nl + sleep_quality_vas + nl + kss + nl +submit_time + nl + comments  ;
+        // localStorage.setItem("Sleep",txt);
+		alert("Completed on "+ today + "....A file will be downloaded")
+        download_txt(today+".csv",entry);
       })
 
       </script>
